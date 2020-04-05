@@ -1,0 +1,48 @@
+*네트워크 프로그래밍
+소켓이라는 것을 기반으로 프로그래밍을 하기 때문에 소켓 프로그래밍이라고도 함.
+네트워크로 연결된 둘 이상의 컴퓨터 사이에서의 데이터 송수신 프로그램의 작성을 의미.
+
+*소켓에 대한 간단한 이해
+네트워크의 연결 도구
+운영체제에 의해 제공이 되는 소프트웨적인 장치
+
+*소켓의 생성
+소켓은 socket 함수의 호출을 통해서 생성됨
+단 전화를 거는 용도의 소켓과 전화를 수신하는 용도의 소켓 생성 방법에는 차이가 있다(서버쪽 두개 생성)
+
+#include<sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+
+int domain - 통신도메인을 지정하는 인자
+도메인은 하나의 영역이라고 생각하면 될까?
+각 도메인은 프로토콜 패밀리로 정의되고 있다
+주로 PF_INET 혹은 AF_INET을 사용 -> 인터넷 프로토콜
+
+int type - 소켓의 형태, 소켓의 연결 형식을 정의한다.
+PF_INET의 경우, 가장 많이 사용하는 소켓 연결형식에는 SOCK_STREAM,SOCK_DGRAM,SOCK_RAW가 있다
+SOCK_STREAM은 TCP/IP 인터넷 프로토콜에서 TCP를 통해서 전송되는 신뢰성 있는 연결을 의미한다
+SOCK_DGRAM은 UDP를 통해 전송하는 신뢰성이 없는 연결을 의미
+SOCK_RAW은 사용자가 만들어 사용하는 것을 의미(헤더를 만듬)
+
+int protocol - 프로토콜 - IPPROTO_TCP,IPPROTO_UDP,IPPROTO_IP
+socket 함수는 인자 값을 받아 소켓을 생성한 후에 해당 소켓의 지정자를 반환한다.
+
+*소켓의 주소 할당 및 연결
+전화기에 전화번호가 부여되듯이 소켓에도 주소정보가 할당
+소켓의 주소정보는 IP와 PORT번호로 구성됨
+
+int bind(ins sockfd, struct sockaddr *myaddr, socklen_t addrlen);
+
+주소의 할당 -> 성공시 0, 실패 시 -1 반환
+
+int sockfd : 소켓 디스크립터
+struct sockaddr *myaddr : 주소 정보로 인터넷을 이용하는 AF_INET인지 시스템 내에서 통신하는 AFUNIX에 따라 달라진다.
+socklen_t addrlen : 구조체의 크기
+
+struct sockaddr_in{
+	sa_family_t sin_family;  //주소패밀리
+	unsigned short int sin_prot; //포트번호
+	struct in_addr sin_addr; //IP 주소
+	unsigned char __pad[__SOCK_SIZE-sizeof(short int) - sizeof(insigned short int) - sizeof(struct in_addr)];
+};
